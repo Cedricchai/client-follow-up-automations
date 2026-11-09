@@ -1,6 +1,7 @@
 # La consigne à donner à Claude Code (offerte dans la vidéo)
 
 > Utilisée pour construire ce système le 07/11/2026 (version anglaise : `prompt-claude-code.md`). À coller dans Claude Code, dans un dossier vide. Remplace ce qui est entre crochets.
+> C'est la consigne d'origine, mot pour mot. Depuis le 9 novembre, le repo envoie tout seul le lien de rendez-vous et les relances après annulation (les relances de devis restent des brouillons) ; chaque mail se règle en haut de `Code.gs`. Marche aussi avec Codex (ChatGPT) : testé le 9 novembre, pas installé chez Google.
 > Tu n'es pas sur Google (Outlook, Excel…) ? Dis quels outils tu utilises dans le premier paragraphe : Claude Code l'adaptera, mais cette version n'est pas testée, et certains outils peuvent être payants.
 
 ---

@@ -13,13 +13,13 @@ Construit avec Claude Code le 7 novembre 2026. C'est la réécriture sans n8n de
 | Chaque matin vers 8 h | Les devis sans réponse depuis 3 jours, puis 7 jours, reçoivent un **brouillon** de relance dans Gmail |
 | Tu passes un devis à « validé » | Le client reçoit un mail avec ton lien de réservation, déjà rempli (nom, e-mail, réf du devis) |
 | Le client réserve, reporte ou annule sur Cal.com | Le tableau se met à jour tout seul : date du RDV, statut |
-| 7 jours, puis 15 jours après une annulation | Un brouillon de relance avec le lien pour reprendre une date |
+| 7 jours, puis 15 jours après une annulation | Un mail de relance avec le lien pour reprendre une date |
 | Chaque lundi vers 8 h | Un rapport dans ta boîte mail : devis relancés, validés, annulations, rendez-vous de la semaine |
 | Rendez-vous pris | Cal.com l'ajoute **lui-même** à ton agenda |
 
 **Coût** : rien de plus pour le faire tourner. Google Sheets, Apps Script et Gmail sont gratuits, et Cal.com a une offre gratuite. Il faut seulement Claude Code (un abonnement Claude) pour construire ou adapter le script.
 **Ordinateur** : il peut être éteint, tout tourne chez Google.
-**Envois** : les relances sont toujours des brouillons. Le mail du lien de rendez-vous est un brouillon par défaut (`ENVOI_LIEN_RDV = 'envoyer'` pour qu'il parte tout seul).
+**Envois** : les relances de devis sont des **brouillons** par défaut, parce que le tableau ne peut pas savoir qu'un client t'a déjà dit oui au téléphone. Le mail du lien de rendez-vous et les relances après annulation **partent tout seuls** par défaut : ils sont déclenchés par ton « validé » ou par Cal.com. Chacun se règle en haut du script, sur `'envoyer'` ou `'brouillon'`.
 
 ## Installation (9 étapes)
 
@@ -32,7 +32,8 @@ Construit avec Claude Code le 7 novembre 2026. C'est la réécriture sans n8n de
    - `SIGNATURE` : ton nom ;
    - `LANGUE` : `'fr'` ou `'en'` (mails, titres du tableau et rapport) ;
    - `LIEN_RDV` : ta page Cal.com ;
-   - `CLE_WEBHOOK` : une longue phrase que toi seul connais.
+   - `CLE_WEBHOOK` : une longue phrase que toi seul connais ;
+   - `ENVOI_RELANCES_DEVIS`, `ENVOI_LIEN_RDV`, `ENVOI_RELANCES_ANNULATION` : `'envoyer'` (part tout seul) ou `'brouillon'` (tu relis d'abord).
 
    Si tu changes `LANGUE` après l'étape 2, relance `creerTableau` pour réécrire les titres.
 7. **L'application web** : **Déployer → Nouveau déploiement → Application web**, « Exécuter en tant que : moi », « Accès : tout le monde ». Copie l'adresse. Sans ta clé secrète, cette adresse ne modifie rien (testé).
@@ -62,9 +63,10 @@ Testé dans mon labo, sur un compte Google créé spécialement pour ces tests e
 | Réf inconnue | Mail d'alerte « rendez-vous sans devis correspondant » |
 | Déclencheur de 8 h | Le 8 novembre, il a préparé tout seul une relance à 8 h 18 |
 | Rapport du lundi | Reçu tout seul le lundi 9 novembre à 8 h 35, avec les bons chiffres |
+| Envoi automatique (9 novembre) | Mail du lien envoyé tout seul dès le passage à « validé » ; relance après annulation envoyée toute seule par la routine du matin ; les deux reçus |
 | Agenda | Vérifié avec Google Agenda. iCloud et iPhone pas regardés |
 
-**Tests de la logique** : `node tests/tester-suivi.mjs` rejoue toutes les règles sur des données fictives. 43 vérifications au moment du tournage (7 novembre) ; **60** depuis l'ajout de l'anglais le 9 novembre (statuts, tableau et rapport en anglais). Pour vérifier que les tests servent à quelque chose, le code a été cassé exprès : les tests l'ont vu.
+**Tests de la logique** : `node tests/tester-suivi.mjs` rejoue toutes les règles sur des données fictives. 43 vérifications au moment du tournage (7 novembre) ; **61** depuis le 9 novembre (statuts, tableau et rapport en anglais ; réglages d'envoi). Pour vérifier que les tests servent à quelque chose, le code a été cassé exprès : les tests l'ont vu.
 
 **Bon à savoir** : un report n'envoie pas d'annulation (testé deux fois : par le photographe et par le client). Une annulation très ancienne, découverte tard, peut recevoir ses deux relances deux jours de suite (cas rare).
 
@@ -73,6 +75,7 @@ Testé dans mon labo, sur un compte Google créé spécialement pour ces tests e
 - **Fait pour l'environnement Google** : Google Sheets, Apps Script, Gmail et Google Agenda (par Cal.com). C'est le seul environnement testé.
 - **Sur Outlook, Excel ou d'autres outils**, ce code ne marche pas tel quel. Tu peux donner la consigne (`consigne-claude-code.md`) à Claude Code en précisant tes outils pour qu'il l'adapte, mais ce n'est pas testé, et certains outils (par exemple chez Microsoft) peuvent être payants.
 - **Les mails sont des modèles fixes** que tu modifies dans `Code.gs` : aucune IA ne les rédige au quotidien. Essai du 9 novembre 2026 : la formule gratuite de l'API Gemini a été refusée pour les projets essayés.
+- **Avec Codex (ChatGPT) au lieu de Claude Code** : le 9 novembre, la même consigne donnée à Codex a construit une version qui marche, avec ses propres tests (90/90 réussis), en 8 minutes environ. Cette version n'a pas été installée chez Google.
 - Si tu veux relier beaucoup d'outils différents en blocs, ou qu'une IA rédige chaque mail, un outil comme n8n (payant en ligne) reste plus simple.
 
 ## Les fichiers

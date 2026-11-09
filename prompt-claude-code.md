@@ -1,6 +1,7 @@
 # The prompt to give Claude Code (from the video)
 
 > English version of the prompt used to build this system on 7 November 2026 (French version: `consigne-claude-code.md`). Paste it into Claude Code, in an empty folder. Replace what's between brackets.
+> This is the original prompt, translated word for word. Since 9 November, the repo sends the booking link and the cancellation follow-ups automatically by default (quote follow-ups stay drafts); each email can be switched at the top of `Code.gs`. Works with Codex (ChatGPT) too: tested on 9 November, not installed at Google.
 > Not using Google (Outlook, Excel…)? Say which tools you use in the first paragraph: Claude Code will adapt it, but that version isn't tested and some tools may cost money.
 
 ---

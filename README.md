@@ -15,13 +15,13 @@ Built with Claude Code on 7 November 2026. It is the n8n-free rewrite of automat
 | Every morning around 8 am | Quotes with no answer after 3 days, then 7 days, get a follow-up **draft** in Gmail |
 | You set a quote to `approved` | The client gets an email with your booking link, already filled in (name, email, quote ref) |
 | The client books, reschedules or cancels on Cal.com | The sheet updates itself: appointment date and status |
-| 7 days, then 15 days after a cancellation | A follow-up draft with the link to pick a new date |
+| 7 days, then 15 days after a cancellation | A follow-up email with the link to pick a new date |
 | Every Monday around 8 am | A report in your inbox: quotes followed up, approved, cancellations, appointments for the week |
 | Appointment booked | Cal.com adds it to your calendar **itself** |
 
 **Cost:** nothing extra to run it. Google Sheets, Apps Script and Gmail are free, and Cal.com has a free plan. You only need Claude Code (a Claude subscription) to build or adapt the script.
 **Computer:** it can be off, everything runs at Google.
-**Sending:** follow-ups are always drafts. The booking-link email is a draft by default (set `ENVOI_LIEN_RDV = 'envoyer'` to send it automatically).
+**Sending:** quote follow-ups are **drafts** by default, because the sheet can't know that a client already said yes on the phone. The booking-link email and the cancellation follow-ups are **sent automatically** by default: they're triggered by your "approved" or by Cal.com. Each one can be switched to `'envoyer'` (sent) or `'brouillon'` (draft) at the top of the script.
 
 ## Install (9 steps)
 
@@ -34,7 +34,8 @@ Built with Claude Code on 7 November 2026. It is the n8n-free rewrite of automat
    - `SIGNATURE`: your name;
    - `LANGUE`: `'en'` for English (emails, sheet headers, report), `'fr'` for French;
    - `LIEN_RDV`: your Cal.com booking page;
-   - `CLE_WEBHOOK`: a long sentence only you know.
+   - `CLE_WEBHOOK`: a long sentence only you know;
+   - `ENVOI_RELANCES_DEVIS`, `ENVOI_LIEN_RDV`, `ENVOI_RELANCES_ANNULATION`: `'envoyer'` (sent automatically) or `'brouillon'` (draft you check first).
 
    If you change `LANGUE` after step 2, run `creerTableau` again to rewrite the headers.
 7. **The web app:** **Deploy → New deployment → Web app**, "Execute as: me", "Who has access: anyone". Copy the address. Without your secret key, this address changes nothing (tested).
@@ -65,9 +66,10 @@ Tested in my lab, on a Google account created only for these tests and a free Ca
 | Unknown ref | Alert email "booking with no matching quote" |
 | 8 am trigger | On 8 November, it prepared a follow-up draft by itself at 8:18 am |
 | Monday report | Received by itself on Monday 9 November at 8:35 am, with the right numbers |
+| Automatic sending (9 November) | Booking-link email sent by itself as soon as the quote was set to "validé"; cancellation follow-up sent by itself by the morning routine; both received |
 | Calendar | Checked with Google Calendar. iCloud and iPhone not checked |
 
-**Logic tests:** `node tests/tester-suivi.mjs` replays every rule on fake data. 43 checks at the time of filming (7 November); **60** since English support was added on 9 November (English statuses, sheet and report). To make sure the tests are useful, the code was broken on purpose: the tests caught it.
+**Logic tests:** `node tests/tester-suivi.mjs` replays every rule on fake data. 43 checks at the time of filming (7 November); **61** since 9 November (English statuses, sheet and report; sending settings). To make sure the tests are useful, the code was broken on purpose: the tests caught it.
 
 **Good to know:** a reschedule does not send a cancellation (tested twice: by the business owner and by the client). A very old cancellation, found late, can get both follow-ups two days in a row (rare).
 
@@ -76,6 +78,7 @@ Tested in my lab, on a Google account created only for these tests and a free Ca
 - **Made for the Google world:** Google Sheets, Apps Script, Gmail, and Google Calendar (through Cal.com). It's the only setup I tested.
 - **On Outlook, Excel or other tools**, this code won't work as is. You can give the prompt (`prompt-claude-code.md`) to Claude Code and tell it which tools you use so it adapts it, but that's not tested, and some tools (for example in the Microsoft world) can cost money.
 - **The emails are fixed templates** you change in `Code.gs`: no AI writes them every day. Test on 9 November 2026: the Gemini API free tier was refused for the projects I tried.
+- **With Codex (ChatGPT) instead of Claude Code:** on 9 November, the same prompt given to Codex built a working version with its own tests (90/90 passed) in about 8 minutes. That version wasn't installed at Google.
 - If you want to connect lots of different tools with blocks, or have an AI write every email, a tool like n8n (paid in the cloud) is still simpler.
 
 ## Files

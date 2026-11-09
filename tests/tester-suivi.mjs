@@ -122,6 +122,9 @@ const semaineEn = [E.TITRES,
   ligne({...base, ref: 'D', statut: 'approved', dateRdv: '10/11/2026 9:00', statutRdv: 'cancelled', dateAnnulation: '08/11/2026'})];
 verifier('anglais : RDV à venir sans l\'annulé', E.statsSemaine(semaineEn, auj).rdvAVenir.map(r => r.date.getDate()), [12]);
 
+// 9. Les envois par défaut : relances de devis en brouillon (le tableau peut ne pas être à jour), le reste envoyé
+verifier('envois par défaut', S.ENVOI, {relancesDevis: 'brouillon', lienRdv: 'envoyer', relancesAnnulation: 'envoyer'});
+
 console.log(echecs.join('\n'));
 console.log(`${total - echecs.length}/${total} vérifications OK`);
 process.exit(echecs.length ? 1 : 0);

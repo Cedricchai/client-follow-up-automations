@@ -2,10 +2,10 @@
  * Suivi client d'un photographe (ou de tout indépendant qui envoie des devis), sans n8n ni serveur.
  * Tout tourne gratuitement chez Google, ordinateur éteint. Construit avec Claude Code.
  *
- *   1. Devis en attente      → brouillon de relance à 3 jours, puis à 7 jours
- *   2. Devis passé à « validé » → mail au client avec un lien de rendez-vous pré-rempli (Cal.com)
+ *   1. Devis en attente      → brouillon de relance à 3 jours, puis à 7 jours (tu relis : le tableau peut ne pas être à jour)
+ *   2. Devis passé à « validé » → mail envoyé au client avec un lien de rendez-vous pré-rempli (Cal.com)
  *   3. Rendez-vous pris, reporté ou annulé sur Cal.com → le tableau se met à jour tout seul
- *   4. Rendez-vous annulé    → relance à 7 jours, puis à 15 jours, avec le lien pour reprendre une date
+ *   4. Rendez-vous annulé    → relance envoyée à 7 jours, puis à 15 jours, avec le lien pour reprendre une date
  *   5. Chaque lundi          → un rapport de la semaine dans ta boîte mail
  *
  * Les rendez-vous arrivent dans ton agenda (Google ou iCloud, donc aussi sur iPhone) grâce à Cal.com lui-même :
@@ -21,7 +21,10 @@ const LIEN_RDV = 'https://cal.com/TON-COMPTE/TON-EVENEMENT'; // ta page de rése
 const CLE_WEBHOOK = 'change-moi-par-une-longue-phrase-secrete'; // protège l'adresse que Cal.com appelle
 const JOURS_RELANCE_DEVIS = [3, 7];                   // relances d'un devis sans réponse
 const JOURS_RELANCE_ANNULATION = [7, 15];             // relances après un rendez-vous annulé
-const ENVOI_LIEN_RDV = 'brouillon';                   // 'brouillon' (tu relis) ou 'envoyer' (part tout seul)
+// Pour chaque mail : 'envoyer' (part tout seul) ou 'brouillon' (il t'attend dans Gmail, pour le relire ou le personnaliser)
+const ENVOI_RELANCES_DEVIS = 'brouillon';             // brouillon par défaut : un client a pu dire oui au téléphone sans que le tableau le sache
+const ENVOI_LIEN_RDV = 'envoyer';                     // le lien Cal.com part dès que tu écris « validé »
+const ENVOI_RELANCES_ANNULATION = 'envoyer';          // l'annulation vient de Cal.com : l'information est sûre
 const SIMULATION = true;                              // true = écrit dans le journal ce qu'il ferait, sans rien toucher
 
 // Colonnes du tableau « Suivi » (0 = colonne A). La ligne 1 contient les titres.
@@ -202,11 +205,11 @@ function quotidien() {
   for (let i = 1; i < lignes.length; i++) {
     const l = lignes[i];
     const n = relanceDevisAFaire_(l, aujourdhui);
-    if (n) { brouillonOuEnvoi_(texte_(l[COL.email]), T_().relanceDevis(l, n), false); ecrire_(f, i, n === 1 ? COL.relance1 : COL.relance2, aujourdhui); devis++; }
+    if (n) { brouillonOuEnvoi_(texte_(l[COL.email]), T_().relanceDevis(l, n), ENVOI_RELANCES_DEVIS === 'envoyer'); ecrire_(f, i, n === 1 ? COL.relance1 : COL.relance2, aujourdhui); devis++; }
     const a = relanceAnnulationAFaire_(l, aujourdhui);
-    if (a) { brouillonOuEnvoi_(texte_(l[COL.email]), T_().relanceAnnulation(l, a), false); ecrire_(f, i, COL.relancesAnnulation, a); annul++; }
+    if (a) { brouillonOuEnvoi_(texte_(l[COL.email]), T_().relanceAnnulation(l, a), ENVOI_RELANCES_ANNULATION === 'envoyer'); ecrire_(f, i, COL.relancesAnnulation, a); annul++; }
   }
-  console.log(`${devis} relance(s) de devis, ${annul} relance(s) après annulation ${SIMULATION ? 'simulées' : 'en brouillon'}.`);
+  console.log(`${devis} relance(s) de devis (${SIMULATION ? 'simulées' : ENVOI_RELANCES_DEVIS}), ${annul} relance(s) après annulation (${SIMULATION ? 'simulées' : ENVOI_RELANCES_ANNULATION}).`);
 }
 
 /** Déclencheur « à la modification » : un devis passe à « validé » → lien de rendez-vous au client. */
@@ -265,4 +268,5 @@ function installerDeclencheurs() {
 
 // Pour les tests hors Google (Node) ; ignoré par Apps Script
 if (typeof module !== 'undefined') module.exports = {relanceDevisAFaire: relanceDevisAFaire_, relanceAnnulationAFaire: relanceAnnulationAFaire_,
-  lienRdv: lienRdv_, lireEvenementCal: lireEvenementCal_, appliquerEvenement: appliquerEvenement_, statsSemaine: statsSemaine_, TEXTES, COL, TITRES};
+  lienRdv: lienRdv_, lireEvenementCal: lireEvenementCal_, appliquerEvenement: appliquerEvenement_, statsSemaine: statsSemaine_, TEXTES, COL, TITRES,
+  ENVOI: {relancesDevis: ENVOI_RELANCES_DEVIS, lienRdv: ENVOI_LIEN_RDV, relancesAnnulation: ENVOI_RELANCES_ANNULATION}};
