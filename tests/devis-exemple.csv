@@ -1,0 +1,7 @@
+Client,E-mail,Prestation,Montant,Réf devis,Date du devis,Statut,Relance 1,Relance 2,Lien RDV envoyé,Date RDV,Statut RDV,Date annulation,Relances annulation
+Sophie Martin,sophie.martin@example.com,séance famille,350,D-001,06/11/2026,envoyé,,,,,,,
+Karim Benali,karim.benali@example.com,mariage,1900,D-002,02/11/2026,envoyé,05/11/2026,,,,,,
+Julie Petit,julie.petit@example.com,portrait pro,180,D-003,28/10/2026,validé,31/10/2026,,30/10/2026,12/11/2026 10:00,pris,,
+Marc Durand,marc.durand@example.com,séance grossesse,280,D-004,20/10/2026,validé,,,22/10/2026,05/11/2026 15:00,annulé,02/11/2026,0
+Léa Garnier,lea.garnier@example.com,photos produits,600,D-005,01/11/2026,refusé,04/11/2026,,,,,,
+Thomas Roux,thomas.roux@example.com,séance couple,250,D-006,08/11/2026,envoyé,,,,,,,

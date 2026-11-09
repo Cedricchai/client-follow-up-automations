@@ -1,0 +1,7 @@
+Client,Email,Service,Amount,Quote ref,Quote date,Status,Follow-up 1,Follow-up 2,Booking link sent,Appointment date,Appointment status,Cancellation date,Cancellation follow-ups
+Sophie Martin,sophie.martin@example.com,family session,350,D-001,2026-11-06,sent,,,,,,,
+Karim Benali,karim.benali@example.com,wedding,1900,D-002,2026-11-02,sent,2026-11-05,,,,,,
+Julie Petit,julie.petit@example.com,headshots,180,D-003,2026-10-28,approved,2026-10-31,,2026-10-30,2026-11-12 10:00,booked,,
+Marc Durand,marc.durand@example.com,maternity session,280,D-004,2026-10-20,approved,,,2026-10-22,2026-11-05 15:00,cancelled,2026-11-02,0
+Lea Garnier,lea.garnier@example.com,product photos,600,D-005,2026-11-01,declined,2026-11-04,,,,,,
+Thomas Roux,thomas.roux@example.com,couple session,250,D-006,2026-11-08,sent,,,,,,,
