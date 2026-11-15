@@ -1,5 +1,5 @@
 /**
- * Suivi client d'un photographe (ou de tout indépendant qui envoie des devis), sans n8n ni serveur.
+ * Suivi client d'un photographe (ou de tout indépendant qui envoie des devis), sans n8n, sans serveur à louer ni à gérer.
  * Tout tourne gratuitement chez Google, ordinateur éteint. Construit avec Claude Code.
  *
  *   1. Devis en attente      → brouillon de relance à 3 jours, puis à 7 jours (tu relis : le tableau peut ne pas être à jour)

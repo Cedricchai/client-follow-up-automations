@@ -1,4 +1,4 @@
-# Client follow-up automations, without n8n or a server
+# Client follow-up automations, without n8n, with no server to rent or manage
 
 *[Version française : README.fr.md](README.fr.md)*
 
@@ -29,21 +29,37 @@ Built with Claude Code on 7 November 2026. It is the n8n-free rewrite of automat
 2. **The code:** paste `Code.gs`, save, then run **`creerTableau`** (it creates the sheet).
 3. **Google's permission screen:** Google says it **hasn't verified this app**. That's normal for a script you made yourself: **Advanced → Go to the project**, then allow.
 4. **The "Suivi" sheet** appears with its 14 columns. You fill in the first 7, the script fills in the rest. Add a fake quote, or import `tests/quotes-example.csv` (File → Import).
+   - To try a real booking in step 8, use **your own address with an alias**: `your.address+sophie@gmail.com`. Gmail ignores what follows the `+`, the email lands in your inbox, and Cal.com accepts it. With an `@example.com` address, Cal.com refuses the booking.
+   - The quote date must be **at least 3 days old**, otherwise no follow-up is proposed.
 5. **The simulation:** run `quotidien` and `rapportHebdo`. With `SIMULATION = true`, the **execution log** says what it would do, without touching anything.
 6. **The settings**, at the top of the script:
    - `SIGNATURE`: your name;
    - `LANGUE`: `'en'` for English (emails, sheet headers, report), `'fr'` for French;
-   - `LIEN_RDV`: your Cal.com booking page;
-   - `CLE_WEBHOOK`: a long sentence only you know;
-   - `ENVOI_RELANCES_DEVIS`, `ENVOI_LIEN_RDV`, `ENVOI_RELANCES_ANNULATION`: `'envoyer'` (sent automatically) or `'brouillon'` (draft you check first).
+   - `LIEN_RDV`: your Cal.com booking link (see "Set up Cal.com" just below);
+   - `CLE_WEBHOOK`: a long sentence only you know, **with no spaces or accents** (words separated by hyphens): it goes into a web address;
+   - `ENVOI_RELANCES_DEVIS`, `ENVOI_LIEN_RDV`, `ENVOI_RELANCES_ANNULATION`: `'envoyer'` (sent automatically) or `'brouillon'` (draft you check first);
+   - **last, live mode:** set `SIMULATION = false`, then save. In the next step, the deployment keeps a copy of the code as it is at that moment, and that copy is what Cal.com will call. Nothing is sent by itself yet: there is still no trigger and no webhook.
 
    If you change `LANGUE` after step 2, run `creerTableau` again to rewrite the headers.
-7. **The web app:** **Deploy → New deployment → Web app**, "Execute as: me", "Who has access: anyone". Copy the address. Without your secret key, this address changes nothing (tested).
-8. **Cal.com:**
-   - **Webhook:** **Settings → Developer → Webhooks**, paste the address and add `?cle=` followed by your secret sentence. Tick *Booking created*, *Booking rescheduled* and *Booking cancelled*. Cal.com's free plan has webhooks.
-   - **Calendar:** in Apps, connect your calendar so bookings show up in it.
-   - **Notes field:** keep it on your event type. That's where the quote ref travels.
-9. **Live mode:** set `SIMULATION = false`, then run **`installerDeclencheurs` once**. From there, it runs by itself.
+
+   **Set up Cal.com** (to get your booking link):
+   1. create a free account on cal.com;
+   2. **calendar:** **Apps → Installed apps → Calendar**, connect your calendar so bookings show up in it and busy slots are blocked;
+   3. **availability:** **Availability**, set your days, your hours and your time zone;
+   4. **the link:** in **Links**, create a link with a title and a duration;
+   5. in that link's settings: **Add to calendar** = your calendar; in **Booking form**, keep **Additional notes** visible. That's where the quote ref travels;
+   6. copy the link (**Copy link**) and paste it into `LIEN_RDV`.
+7. **The web app:** **Deploy → New deployment → Web app**, "Execute as: me", "Who has access: anyone". Copy the address: it ends with `/exec`. Without your secret key, this address changes nothing (tested).
+8. **The Cal.com webhook:** **Settings → Developer → Webhooks → New**.
+   - **Subscriber URL:** paste the address from step 7, then **add `?cle=` and your secret sentence at the end**, exactly the one in `CLE_WEBHOOK`:
+     - before: `https://script.google.com/macros/s/…/exec`
+     - after: `https://script.google.com/macros/s/…/exec?cle=my-long-secret-sentence`
+   - **Event triggers:** click *Clear all triggers* (the list is long), then tick only *Booking created*, *Booking rescheduled* and *Booking canceled*.
+   - Leave **Secret** empty: the key is already in the address. Cal.com's free plan has webhooks.
+   - **If the sheet doesn't change after a booking**, read that address again: it must end with `/exec?cle=` followed by your sentence. Nothing warns you if you forget: Cal.com saves the webhook and the client still gets their email.
+9. **The triggers:** run **`installerDeclencheurs` once**. From there, it runs by itself.
+
+**Good to know:** if you later change your secret key or the language, the deployed copy doesn't know. Go to **Deploy → Manage deployments → pencil → New version → Deploy**: the address stays the same.
 
 ## The columns of the "Suivi" sheet
 
@@ -67,6 +83,7 @@ Tested in my lab, on a Google account created only for these tests and a free Ca
 | 8 am trigger | On 8 November, it prepared a follow-up draft by itself at 8:18 am |
 | Monday report | Received by itself on Monday 9 November at 8:35 am, with the right numbers |
 | Automatic sending (9 November) | Booking-link email sent by itself as soon as the quote was set to "validé"; cancellation follow-up sent by itself by the morning routine; both received |
+| Full install replayed (13 November) | In the order of this README, with Google and Cal.com in English: booking, reschedule and cancellation written in the sheet; cancellation follow-up and report run by hand |
 | Calendar | Checked with Google Calendar. iCloud and iPhone not checked |
 
 **Logic tests:** `node tests/tester-suivi.mjs` replays every rule on fake data. 43 checks at the time of filming (7 November); **61** since 9 November (English statuses, sheet and report; sending settings). To make sure the tests are useful, the code was broken on purpose: the tests caught it.

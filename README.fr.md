@@ -1,4 +1,4 @@
-# Automatisations de suivi client, sans n8n ni serveur
+# Automatisations de suivi client, sans n8n, sans serveur à louer ni à gérer
 
 *[English version: README.md](README.md)*
 
@@ -23,25 +23,43 @@ Construit avec Claude Code le 7 novembre 2026. C'est la réécriture sans n8n de
 
 ## Installation (9 étapes)
 
+Les noms entre parenthèses sont ceux des boutons quand Google est en anglais. Les menus de Cal.com sont donnés en anglais.
+
 1. **Le tableau** : crée un nouveau Google Sheet, puis **Extensions → Apps Script**.
-2. **Le code** : colle `Code.gs`, enregistre, puis lance **`creerTableau`** (il crée la feuille).
-3. **L'autorisation Google** : Google affiche **« Google n'a pas validé cette application »**. C'est normal pour un script que tu as fait toi-même : **Paramètres avancés → Accéder au projet**, puis autorise.
+2. **Le code** : colle `Code.gs`, enregistre, puis lance **`creerTableau`** avec **Exécuter** (*Run*) : il crée la feuille.
+3. **L'autorisation Google** : Google affiche **« Google n'a pas validé cette application »** (*Google hasn't verified this app*). C'est normal pour un script que tu as fait toi-même : **Paramètres avancés → Accéder au projet** (*Advanced → Go to … (unsafe)*), puis autorise.
 4. **La feuille « Suivi »** apparaît avec ses 14 colonnes. Tu remplis les 7 premières, le script remplit le reste. Tape un faux devis, ou importe `tests/devis-exemple.csv` (Fichier → Importer).
-5. **La simulation** : lance `quotidien` et `rapportHebdo`. Avec `SIMULATION = true`, le **journal d'exécution** dit ce qu'il ferait, sans rien toucher.
+   - Pour essayer une vraie réservation à l'étape 8, mets **ta propre adresse avec un alias** : `ton.adresse+sophie@gmail.com`. Gmail ignore ce qui suit le `+`, le mail arrive chez toi, et Cal.com l'accepte. Avec une adresse en `@example.com`, Cal.com refuse la réservation.
+   - La date du devis doit avoir **au moins 3 jours**, sinon aucune relance n'est proposée. Si ton Google Sheets est en anglais, le mois s'écrit d'abord : `11/08/2026` pour le 8 novembre.
+5. **La simulation** : lance `quotidien` et `rapportHebdo`. Avec `SIMULATION = true`, le **journal d'exécution** (*Execution log*) dit ce qu'il ferait, sans rien toucher.
 6. **Les réglages**, en haut du script :
    - `SIGNATURE` : ton nom ;
    - `LANGUE` : `'fr'` ou `'en'` (mails, titres du tableau et rapport) ;
-   - `LIEN_RDV` : ta page Cal.com ;
-   - `CLE_WEBHOOK` : une longue phrase que toi seul connais ;
-   - `ENVOI_RELANCES_DEVIS`, `ENVOI_LIEN_RDV`, `ENVOI_RELANCES_ANNULATION` : `'envoyer'` (part tout seul) ou `'brouillon'` (tu relis d'abord).
+   - `LIEN_RDV` : ton lien de rendez-vous Cal.com (voir « Préparer Cal.com », juste en dessous) ;
+   - `CLE_WEBHOOK` : une longue phrase que toi seul connais, **sans espace ni accent** (des mots séparés par des tirets) : elle ira dans une adresse web ;
+   - `ENVOI_RELANCES_DEVIS`, `ENVOI_LIEN_RDV`, `ENVOI_RELANCES_ANNULATION` : `'envoyer'` (part tout seul) ou `'brouillon'` (tu relis d'abord) ;
+   - **en dernier, le mode réel** : `SIMULATION = false`, puis enregistre. À l'étape suivante, le déploiement garde une copie du code tel qu'il est à ce moment-là, et c'est cette copie que Cal.com appellera. Rien ne part tout seul pour autant : il n'y a encore ni déclencheur ni webhook.
 
    Si tu changes `LANGUE` après l'étape 2, relance `creerTableau` pour réécrire les titres.
-7. **L'application web** : **Déployer → Nouveau déploiement → Application web**, « Exécuter en tant que : moi », « Accès : tout le monde ». Copie l'adresse. Sans ta clé secrète, cette adresse ne modifie rien (testé).
-8. **Cal.com** :
-   - **Webhook** : **Paramètres → Développeur → Webhooks**, colle l'adresse en ajoutant `?cle=` puis ta phrase secrète. Coche *Booking created*, *Booking rescheduled* et *Booking cancelled*. L'offre gratuite de Cal.com a les webhooks.
-   - **Agenda** : dans Applications, connecte ton agenda pour que les rendez-vous y arrivent.
-   - **Champ « notes »** : laisse-le actif sur ton type de rendez-vous. C'est là que voyage la réf du devis.
-9. **Le mode réel** : `SIMULATION = false`, puis lance **une seule fois** `installerDeclencheurs`. À partir de là, ça tourne tout seul.
+
+   **Préparer Cal.com** (pour avoir ton lien de rendez-vous) :
+   1. crée un compte gratuit sur cal.com ;
+   2. **l'agenda** : **Apps → Installed apps → Calendar**, connecte ton agenda pour que les rendez-vous y arrivent et que les créneaux déjà pris soient bloqués ;
+   3. **tes disponibilités** : **Availability**, règle tes jours, tes heures et ton fuseau horaire ;
+   4. **le lien** : dans **Links**, crée un lien avec un titre et une durée ;
+   5. dans les réglages de ce lien : **Add to calendar** = ton agenda ; dans **Booking form**, laisse **Additional notes** visible. C'est là que voyage la réf du devis ;
+   6. copie le lien (**Copy link**) et colle-le dans `LIEN_RDV`.
+7. **L'application web** : **Déployer → Nouveau déploiement → Application web** (*Deploy → New deployment → Web app*), « Exécuter en tant que : moi », « Accès : tout le monde ». Copie l'adresse : elle finit par `/exec`. Sans ta clé secrète, cette adresse ne modifie rien (testé).
+8. **Le webhook Cal.com** : **Settings → Developer → Webhooks → New**.
+   - **Subscriber URL** : colle l'adresse de l'étape 7, puis **ajoute au bout `?cle=` et ta phrase secrète**, exactement celle de `CLE_WEBHOOK` :
+     - avant : `https://script.google.com/macros/s/…/exec`
+     - après : `https://script.google.com/macros/s/…/exec?cle=ma-longue-phrase-secrete`
+   - **Event triggers** : clique sur *Clear all triggers* (la liste est longue), puis coche seulement *Booking created*, *Booking rescheduled* et *Booking canceled*.
+   - Laisse **Secret** vide : la clé est déjà dans l'adresse. L'offre gratuite de Cal.com a les webhooks.
+   - **Si le tableau ne bouge pas après une réservation**, relis cette adresse : elle doit finir par `/exec?cle=` suivi de ta phrase. Rien ne signale l'oubli : Cal.com enregistre le webhook et le client reçoit son mail quand même.
+9. **Les déclencheurs** : lance **une seule fois** `installerDeclencheurs`. À partir de là, ça tourne tout seul.
+
+**Bon à savoir** : si tu changes plus tard ta clé secrète ou la langue, la copie déployée ne le sait pas. Fais **Déployer → Gérer les déploiements → crayon → Nouvelle version → Déployer** (*Deploy → Manage deployments*) : l'adresse ne change pas.
 
 ## Les colonnes de la feuille « Suivi »
 
@@ -64,6 +82,7 @@ Testé dans mon labo, sur un compte Google créé spécialement pour ces tests e
 | Déclencheur de 8 h | Le 8 novembre, il a préparé tout seul une relance à 8 h 18 |
 | Rapport du lundi | Reçu tout seul le lundi 9 novembre à 8 h 35, avec les bons chiffres |
 | Envoi automatique (9 novembre) | Mail du lien envoyé tout seul dès le passage à « validé » ; relance après annulation envoyée toute seule par la routine du matin ; les deux reçus |
+| Installation complète rejouée (13 novembre) | Dans l'ordre de ce README, Google et Cal.com en anglais : réservation, report et annulation écrits dans le tableau ; relance après annulation et rapport lancés à la main |
 | Agenda | Vérifié avec Google Agenda. iCloud et iPhone pas regardés |
 
 **Tests de la logique** : `node tests/tester-suivi.mjs` rejoue toutes les règles sur des données fictives. 43 vérifications au moment du tournage (7 novembre) ; **61** depuis le 9 novembre (statuts, tableau et rapport en anglais ; réglages d'envoi). Pour vérifier que les tests servent à quelque chose, le code a été cassé exprès : les tests l'ont vu.

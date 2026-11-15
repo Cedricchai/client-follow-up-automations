@@ -8,7 +8,7 @@
 
 I'm a [photographer / tradesperson / freelancer]. I send quotes, I forget to follow up, and I lose track of appointments.
 
-Build me a client follow-up system **without n8n or a server**: a Google Apps Script to paste into a Google Sheet, that runs at Google even when my computer is off. Explain each step simply: I want to understand what the script does before I run it.
+Build me a client follow-up system **without n8n, with no server to rent or manage**: a Google Apps Script to paste into a Google Sheet, that runs at Google even when my computer is off. Explain each step simply: I want to understand what the script does before I run it.
 
 What it must do:
 1. Every morning: quotes with no answer after 3 days, then 7 days → a follow-up **draft** in Gmail (never sent automatically), at most one follow-up per quote per day, never for an approved or declined quote.

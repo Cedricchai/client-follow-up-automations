@@ -8,7 +8,7 @@
 
 Je suis [photographe / artisan / indépendant]. J'envoie des devis, j'oublie de relancer, et je perds le fil des rendez-vous.
 
-Construis-moi un système de suivi client **sans n8n ni serveur** : un script Google Apps Script à coller dans un Google Sheet, qui tourne chez Google même quand mon ordinateur est éteint. Explique chaque étape simplement : je veux comprendre ce que fait le script avant de le lancer.
+Construis-moi un système de suivi client **sans n8n, sans serveur à louer ni à gérer** : un script Google Apps Script à coller dans un Google Sheet, qui tourne chez Google même quand mon ordinateur est éteint. Explique chaque étape simplement : je veux comprendre ce que fait le script avant de le lancer.
 
 Ce qu'il doit faire :
 1. Chaque matin : les devis sans réponse depuis 3 jours, puis 7 jours → un **brouillon** de relance dans Gmail (jamais d'envoi automatique), une seule relance par jour et par devis, jamais un devis validé ou refusé.
